@@ -1,114 +1,74 @@
 /************************************************************************************************************
  ************************************************************************************************************
- * Unidad        : Palindromo                                                                      
- * Descripcion   : realiza el calculo de un palindromo
+ * Unidad        : Colas                                                                      
+ * Descripcion   : Implementa una cola usando dos pilas
  * Autor         : Pedro Castro                                                                                    
  * Fecha         : <04/02/2022>   
  ***********************************************************************************************************/
-using System.CodeDom.Compiler;
+using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
 
 class Solucion
 {
 
-    // funcion que completa el aplindromo con el valor mas alto.
-    static string highestValuePalindrome(string s, int n, int k)
+    public class Queue
     {
-        if (n == 1 && k == 1)
-        { //manejo de los casos especiales
-            return "9";
-        }
-        //calculo de pares de numeros diferentes
-        var diferencial = 0;
-        var inicio = 0;
-        var finalizacion = s.Length - 1;
-        var diccionario = new Dictionary<int, int>();
-        while (inicio <= finalizacion)
+        Stack<int> writeQueue = new Stack<int>();
+        Stack<int> readQueue = new Stack<int>();
+
+        public void Enqueue(int number)
         {
-            if (!s[inicio].Equals(s[finalizacion]))
+            writeQueue.Push(number);
+        }
+
+        public int Dequeue()
+        {
+            FillReadQueue();
+            return readQueue.Pop();
+        }
+
+        public int Peek()
+        {
+            FillReadQueue();
+            return readQueue.Peek();
+        }
+
+        private void FillReadQueue()
+        {
+            if (!readQueue.Any())
             {
-                diferencial++;
-                diccionario.Add(inicio, finalizacion);
+                while (writeQueue.Any())
+                {
+                    readQueue.Push(writeQueue.Pop());
+                }
             }
-            inicio++;
-            finalizacion--;
         }
-        //Si es imposible formar un palindromo mas alto
-        if (diferencial > k)
-        {
-            return "-1";
-        }
-        //creacion del palindromo
-        var cl = s.ToCharArray();
-        foreach (var p in diccionario)
-        {
-            var r = Math.Max((int)cl[p.Key], (int)cl[p.Value]);
-            cl[p.Key] = (char)r;
-            cl[p.Value] = (char)r;
-            k--;
-        }
-        //calculo del palindromo
-        var st = 0;
-        var e = s.Length - 1;
-        while (k > 0 && st <= e)
-        {
-            if (diccionario.ContainsKey(st) && k - 1 >= 0 && !cl[st].Equals('9'))
-            {
-                k--;
-                cl[st] = '9';
-                cl[e] = '9';
-            }
-            if (!diccionario.ContainsKey(st) && k - 2 >= 0 && !cl[st].Equals('9'))
-            {
-                k -= 2;
-                cl[st] = '9';
-                cl[e] = '9';
-            }
-            st++;
-            e--;
-        }
-        //condicional para el remplazo de valores
-        if (k == 1 && s.Length % 2 == 1)
-        {
-            cl[s.Length % 2 + 1] = '9';
-        }
-        //resultado
-        var res = new StringBuilder();
-        foreach (var c in cl)
-        {
-            res.Append(c.ToString());
-        }
-        return res.ToString();
     }
-
-    static void Main(string[] args)
+    static void Main(String[] args)
     {
-        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
 
-        string[] nk = Console.ReadLine().Split(' ');
+        int q = int.Parse(Console.ReadLine());
+        Queue queue = new Queue();
 
-        int n = Convert.ToInt32(nk[0]);
+        for (int i = 0; i < q; i++)
+        {
+            var inputString = Console.ReadLine().Split(' ');
+            if (int.Parse(inputString[0]) == 1)
+            {
+                queue.Enqueue(int.Parse(inputString[1]));
+            }
+            else if (int.Parse(inputString[0]) == 2)
+            {
+                queue.Dequeue();
+            }
+            else if (int.Parse(inputString[0]) == 3)
+            {
+                Console.WriteLine(queue.Peek());
+            }
 
-        int k = Convert.ToInt32(nk[1]);
-
-        string s = Console.ReadLine();
-
-        string result = highestValuePalindrome(s, n, k);
-
-        textWriter.WriteLine(result);
-
-        textWriter.Flush();
-        textWriter.Close();
+        }
     }
 }
